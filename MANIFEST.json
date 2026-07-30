@@ -1,0 +1,140 @@
+{
+ "project": "ArturaLabs",
+ "files": [
+  {
+   "path": ".github/workflows/release.yml",
+   "bytes": 2896,
+   "sha256": "7fc6c46ab7dd1633"
+  },
+  {
+   "path": ".gitignore",
+   "bytes": 26,
+   "sha256": "e8bc935ce727f180"
+  },
+  {
+   "path": "HOW TO OPEN IT.txt",
+   "bytes": 1306,
+   "sha256": "049371533708101d"
+  },
+  {
+   "path": "OPEN ARTURALABS (no terminal).bat",
+   "bytes": 550,
+   "sha256": "e2a93848f25090ee"
+  },
+  {
+   "path": "OPEN ARTURALABS (no terminal).command",
+   "bytes": 429,
+   "sha256": "a278231331ebfa33"
+  },
+  {
+   "path": "OPEN ARTURALABS.bat",
+   "bytes": 1254,
+   "sha256": "0cc42cbced680ad8"
+  },
+  {
+   "path": "OPEN ARTURALABS.command",
+   "bytes": 1015,
+   "sha256": "f667d0b262696179"
+  },
+  {
+   "path": "README.md",
+   "bytes": 3785,
+   "sha256": "520f707bf58cbd0b"
+  },
+  {
+   "path": "assets/entitlements.mac.plist",
+   "bytes": 369,
+   "sha256": "a05afdf7fb33d360"
+  },
+  {
+   "path": "assets/mark-white.svg",
+   "bytes": 248,
+   "sha256": "a20a6af9f7ea2c91"
+  },
+  {
+   "path": "assets/mark.svg",
+   "bytes": 248,
+   "sha256": "0e210c40bb74f79b"
+  },
+  {
+   "path": "legal/TERMS-DRAFT.md",
+   "bytes": 9641,
+   "sha256": "a9892f42f93fa00c"
+  },
+  {
+   "path": "package.json",
+   "bytes": 1730,
+   "sha256": "064fa1b6ef22ffe2"
+  },
+  {
+   "path": "scripts/fetch-fonts.js",
+   "bytes": 3088,
+   "sha256": "5e07778db9633ea0"
+  },
+  {
+   "path": "src/main/enrich.js",
+   "bytes": 2292,
+   "sha256": "2e4e9a60f5114715"
+  },
+  {
+   "path": "src/main/keys.js",
+   "bytes": 1253,
+   "sha256": "8db4fb90938148ac"
+  },
+  {
+   "path": "src/main/main.js",
+   "bytes": 14557,
+   "sha256": "b497ba471461a473"
+  },
+  {
+   "path": "src/main/preload.js",
+   "bytes": 1799,
+   "sha256": "61f735d19e3a6af2"
+  },
+  {
+   "path": "src/main/providers/index.js",
+   "bytes": 866,
+   "sha256": "992c69d22cf6fbc2"
+  },
+  {
+   "path": "src/main/providers/mock.js",
+   "bytes": 2288,
+   "sha256": "21e0b2b34218a81a"
+  },
+  {
+   "path": "src/main/providers/serpapi.js",
+   "bytes": 3437,
+   "sha256": "aaeeb50777fce77b"
+  },
+  {
+   "path": "src/main/sitecheck.js",
+   "bytes": 6693,
+   "sha256": "f5d0dcc20f03e241"
+  },
+  {
+   "path": "src/main/store.js",
+   "bytes": 6518,
+   "sha256": "c6e7d60bd2aae580"
+  },
+  {
+   "path": "src/renderer/app.js",
+   "bytes": 150892,
+   "sha256": "a164ee5c73030c48"
+  },
+  {
+   "path": "src/renderer/fonts/fonts.css",
+   "bytes": 51,
+   "sha256": "8ce2738a9821547c"
+  },
+  {
+   "path": "src/renderer/index.html",
+   "bytes": 29769,
+   "sha256": "f4acdc239c3a8c35"
+  },
+  {
+   "path": "src/renderer/styles.css",
+   "bytes": 51432,
+   "sha256": "de619ae3d076aa6d"
+  }
+ ]
+}

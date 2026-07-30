@@ -1,0 +1,41 @@
+HOW TO OPEN ARTURALABS
+======================
+
+Windows   double-click   OPEN ARTURALABS.bat
+Mac       double-click   OPEN ARTURALABS.command
+
+First time takes a few minutes. After that it opens in seconds.
+
+Leave the black window open while you use the app. Closing it closes
+the app.
+
+Once it has worked once, you can use the "(no terminal)" version
+instead - it opens the app on its own with no window hanging around.
+Keep using the normal one whenever something is broken, because that
+is the one that shows you the error messages.
+
+Students never see any of this. They get an installer.
+
+
+IF NOTHING HAPPENS
+------------------
+Node.js probably is not installed. The file above will open nodejs.org
+for you - install the big green LTS button, accept every default, then
+double-click the file again.
+
+
+TO CHECK THE FOLDER IS COMPLETE
+-------------------------------
+If the app looks broken or unstyled, the folder may not have extracted
+properly. Open a terminal in this folder and run:
+
+    node verify.js
+
+It will tell you if any file is missing or wrong.
+
+
+TO MAKE THE INSTALLER FOR STUDENTS
+----------------------------------
+Students never do any of the above. They get one installer file.
+See README.md, or push a version tag to GitHub and it builds both
+the Windows .exe and the Mac .dmg for you.
