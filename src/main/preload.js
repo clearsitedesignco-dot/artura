@@ -6,6 +6,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 const call = (channel, payload) => ipcRenderer.invoke(channel, payload);
 
 contextBridge.exposeInMainWorld('artura', {
+  license: {
+    status:   opts => call('license:status', opts),
+    activate: key => call('license:activate', key),
+    signOut:  () => call('license:signOut')
+  },
   keys: {
     has:    name => call('keys:has', name),
     set:    (name, value) => call('keys:set', { name, value }),

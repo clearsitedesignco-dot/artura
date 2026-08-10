@@ -6,6 +6,7 @@ const keys = require('./keys');
 const providers = require('./providers');
 const sitecheck = require('./sitecheck');
 const { enrich } = require('./enrich');
+const license = require('./license');
 
 const KEY_SEARCH = 'searchApiKey';        // provider-neutral on purpose
 const KEY_AI     = 'anthropicApiKey';     // optional: rewrites outreach drafts
@@ -57,6 +58,13 @@ const handle = (ch, fn) => ipcMain.handle(ch, async (_e, arg) => {
   try { return { ok: true, data: await fn(arg) }; }
   catch (err) { return { ok: false, code: err.code || 'UNKNOWN', message: err.message }; }
 });
+
+/* ---------------- licence ----------------
+   Runs before anything else the member can do. The renderer asks for status on
+   boot and refuses to open the app until this says ok. */
+handle('license:status',   opts => license.status(opts || {}));
+handle('license:activate', key => license.activate(key));
+handle('license:signOut',  () => license.signOut());
 
 /* ---------------- keys ---------------- */
 handle('keys:has',    name => keys.has(name));

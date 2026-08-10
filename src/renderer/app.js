@@ -2560,8 +2560,138 @@ function askUser({ title, fields, confirm = 'Save' }) {
 /* ---------------- boot ---------------- */
 API.onProgress(d => { if (window._progress) window._progress(d.done, d.total, d.found); });
 
+/* ---------------------------------------------------------------------------
+   Licence gate.
+
+   Runs before terms and before setup. Nothing in the app is reachable until
+   this passes, and the wording stays civil throughout — the person reading it
+   has paid, and the most likely reason they are here is that they are new or
+   their wifi dropped.
+--------------------------------------------------------------------------- */
+let licenseState = null;
+
+function lockMsg(text, kind){
+  const el = $('lockMsg');
+  el.className = 'lock-msg' + (kind ? ' ' + kind : '');
+  el.textContent = text || '';
+}
+
+function showLock(state){
+  const titles = {
+    none:            'Sign in to ArturaLabs',
+    revoked:         'We could not confirm your membership',
+    wrong_machine:   'This licence is on another computer',
+    offline_expired: 'Time to check in'
+  };
+  const ledes = {
+    none:            'Paste the licence key from your ArturaLabs purchase. You only do this once on this computer.',
+    revoked:         'Whop did not accept this key. If your payment is up to date, this is usually fixed by pasting the key again.',
+    wrong_machine:   'A licence works on one computer at a time. Reset it from your Whop orders page, then paste it here.',
+    offline_expired: 'ArturaLabs has not been able to reach the licence server for a while. Connect to the internet and unlock again.'
+  };
+  const key = (state && state.state) || 'none';
+  $('lockTitle').textContent = titles[key] || titles.none;
+  $('lockLede').textContent  = ledes[key]  || ledes.none;
+  if (state && state.message && key !== 'none') lockMsg(state.message, 'err');
+  $('lock').hidden = false;
+  setTimeout(() => { const f = $('lockKey'); if (f) f.focus(); }, 60);
+}
+
+async function tryUnlock(){
+  const raw = $('lockKey').value.trim();
+  if (!raw){ lockMsg('Paste your licence key first.', 'err'); return; }
+
+  const btn = $('lockGo');
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = 'Checking…';
+  lockMsg('Checking with Whop…', 'busy');
+
+  const res = await API.license.activate(raw);
+
+  if (res && res.ok){
+    lockMsg('You are in. Opening ArturaLabs…', 'ok');
+    licenseState = { state:'ok', ok:true };
+    setTimeout(() => { $('lock').hidden = true; $('lockKey').value = ''; }, 600);
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = label;
+  const code = res && res.code;
+  const friendly = {
+    EMPTY:        'Paste your licence key first.',
+    NETWORK:      'Could not reach the licence server. Check your internet connection and try again.',
+    BAD_KEY:      'That key was not found. Check for a typo or a missing character at the end.',
+    WRONG_MACHINE:'This licence is already active on another computer. Reset it from your Whop orders page, then try again.',
+    WRONG_PRODUCT:'That key is for a different product.',
+    INACTIVE:     'That membership is no longer active. If you have just renewed, give it a minute and try again.',
+    RATE_LIMIT:   'Too many attempts. Wait a minute and try again.',
+    SERVER_UNCONFIGURED: 'The licence server is not set up yet. This is not a problem with your key — contact support.',
+    NOT_CONFIGURED:      'This build has no licence server configured.'
+  };
+  lockMsg(friendly[code] || (res && res.message) || 'That licence key was not accepted.', 'err');
+}
+
+function renderLicenceRow(){
+  const row = $('licRow'); if (!row || !licenseState) return;
+  if (licenseState.state === 'unconfigured'){ row.hidden = true; return; }
+  row.hidden = false;
+  const bits = [];
+  if (licenseState.plan)  bits.push(licenseState.plan);
+  if (licenseState.email) bits.push(licenseState.email);
+  const when = licenseState.state === 'offline'
+    ? 'Working offline' : 'Active on this computer';
+  $('licStatus').textContent = bits.length ? when + ' · ' + bits.join(' · ') : when;
+}
+
+function wireLicenceRow(){
+  const b = $('licSignOut'); if (!b) return;
+  b.addEventListener('click', async () => {
+    if (b.dataset.armed !== '1'){
+      b.dataset.armed = '1';
+      b.textContent = 'Sign out — click to confirm';
+      b.classList.add('danger');
+      setTimeout(() => { if (b.dataset.armed === '1'){
+        b.dataset.armed = ''; b.textContent = 'Sign out'; b.classList.remove('danger'); } }, 5000);
+      return;
+    }
+    await API.license.signOut();
+    location.reload();
+  });
+}
+
+function wireLicense(){
+  const go = $('lockGo');
+  if (go) go.addEventListener('click', tryUnlock);
+  const f = $('lockKey');
+  if (f) f.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+  document.querySelectorAll('#lock [data-ext]').forEach(a =>
+    a.addEventListener('click', e => { e.preventDefault(); API.openExternal(a.dataset.ext); }));
+}
+
 (async function boot(){
   try{
+    wireLicense();
+
+    /* Licence before anything else. If this does not pass, the app does not
+       open — but the member's saved work is never touched. */
+    const lic = await API.license.status();
+    licenseState = (lic && lic.ok) ? lic.data : null;
+    if (!lic || !lic.ok || !licenseState || !licenseState.ok){
+      showLock(licenseState || (lic && lic.data) || { state:'none' });
+      return;
+    }
+    if (licenseState.state === 'unconfigured'){
+      const b = $('unlicensedBanner'); if (b) b.hidden = false;
+    }
+    wireLicenceRow();
+    renderLicenceRow();
+    if (licenseState.state === 'offline' && licenseState.message){
+      const b = $('unlicensedBanner');
+      if (b){ b.innerHTML = licenseState.message; b.style.background = '#55555D'; b.hidden = false; }
+    }
+
     const [prof, hk, meter] = await Promise.all([
       unwrap(API.profile.get()), unwrap(API.keys.has('searchApiKey')), API.meter()
     ]);

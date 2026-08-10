@@ -21,10 +21,8 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-mark" viewBox="0 0 120 100">
-    <path d="M38 4 L74 96 L56 96 L38 48 L20 96 L2 96 Z"/>
-    <path d="M52 96 L96 2 L118 2 L118 30 L104 20 L72 96 Z"/>
-    <path d="M100 96 L100 46 L118 38 L118 96 Z"/>
+  <symbol id="i-mark" viewBox="0 0 100 100">
+    <path d="M98.4 100L84.67 100C84.67 100 86.43 104.23 84.49 99.82C82.55 95.41 75.89 79.96 73.04 73.55C70.19 67.15 68.93 64.6 67.38 61.39C65.83 58.17 64.91 56.35 63.77 54.28C62.62 52.21 61.5 50.42 60.51 48.98C59.53 47.53 58.63 46.48 57.86 45.6C57.09 44.73 56.47 44.23 55.87 43.73C55.28 43.24 54.79 42.93 54.31 42.65C53.83 42.37 53.38 42.19 52.98 42.05C52.58 41.91 52.46 41.83 51.9 41.81C51.34 41.79 50.43 41.71 49.61 41.93C48.79 42.15 47.68 42.71 46.96 43.13C46.23 43.55 45.78 44.01 45.27 44.46C44.76 44.91 44.62 44.97 43.89 45.84C43.15 46.72 41.86 48.29 40.87 49.7C39.89 51.1 39.13 52.33 37.98 54.28C36.84 56.22 36.15 57.27 34.01 61.39C31.86 65.5 26.8 75.58 25.09 78.98C23.38 82.37 23.99 81.2 23.77 81.75C23.54 82.29 23.77 82.23 23.77 82.23L24.19 82.29C24.19 82.29 29.03 76.79 31.23 74.52C33.44 72.25 35.8 70.09 37.44 68.67C39.08 67.26 40.11 66.67 41.05 66.02C42 65.38 42.28 65.24 43.1 64.82C43.93 64.4 44.91 63.9 45.99 63.49C47.08 63.09 48.56 62.65 49.61 62.41C50.65 62.17 51.38 62.11 52.26 62.05C53.14 61.99 54.09 61.99 54.91 62.05C55.73 62.11 56.48 62.21 57.2 62.41C57.92 62.61 58.63 62.86 59.25 63.25C59.86 63.64 60.44 64.25 60.87 64.76C61.31 65.27 61.64 65.96 61.84 66.33C62.04 66.69 62.08 66.93 62.08 66.93L61.96 67.41L61.54 67.71C61.54 67.71 61.11 67.61 60.45 67.71C59.79 67.81 58.44 68.07 57.56 68.31C56.68 68.55 56.09 68.73 55.15 69.16C54.21 69.58 53.06 70.1 51.9 70.84C50.73 71.59 49.36 72.58 48.16 73.61C46.97 74.65 45.98 75.61 44.73 77.05C43.47 78.48 41.78 80.7 40.63 82.23C39.49 83.76 39.8 83.24 37.86 86.2C35.92 89.17 29.01 100 29.01 100L1.6 99.94C1.6 99.94 14.09 74.22 20.87 60.06C27.66 45.9 37.51 25.01 42.32 15C47.13 4.99 49.73 0 49.73 0L50.03 0.06C50.03 0.06 51.9 3.59 56.9 13.92C61.9 24.24 73.36 48.23 80.03 61.99C86.7 75.74 93.85 90.2 96.9 96.45C99.95 102.69 98.09 98.87 98.34 99.46C98.59 100.05 98.4 100 98.4 100Z"/>
   </symbol>
   <symbol id="i-home" viewBox="0 0 24 24">
     <path d="M2 21 L7 8 L12 21 L9.5 21 L7 14.5 L4.5 21 Z"/><path d="M11 21 L17 3 L22 21 L19.2 21 L17 12 L13.8 21 Z"/>
@@ -75,7 +73,7 @@
 <!-- SIDEBAR -->
 <aside class="rail">
   <div class="brand">
-    <svg class="lg" viewBox="0 0 120 100"><use href="#i-mark"/></svg>
+    <svg class="lg" viewBox="0 0 100 100"><use href="#i-mark"/></svg>
     <div class="wm">Artura<span>Labs</span></div>
   </div>
   <nav class="nav">
@@ -386,6 +384,13 @@
   <!-- KEY VAULT -->
   <section class="view" id="v-keys" hidden>
     <p class="lede">Keys are stored in your computer's keychain and never leave this machine. Paste one and it's checked right away, so you find out here rather than three screens later.</p>
+    <div class="lic-row" id="licRow" hidden>
+      <div>
+        <div class="lic-t">ArturaLabs membership</div>
+        <div class="lic-s" id="licStatus">Checking…</div>
+      </div>
+      <button class="btn ghost" id="licSignOut">Sign out</button>
+    </div>
     <div class="krow">
       <div class="ktop">
         <div>
@@ -423,7 +428,7 @@
   <!-- ABOUT -->
   <section class="view" id="v-about" hidden>
     <div class="empty">
-      <span class="bigico" style="opacity:1;width:58px;height:58px"><svg viewBox="0 0 120 100" style="width:58px;height:58px"><use href="#i-mark"/></svg></span>
+      <span class="bigico" style="opacity:1;width:58px;height:58px"><svg viewBox="0 0 100 100" style="width:58px;height:58px"><use href="#i-mark"/></svg></span>
       <h3 style="font-size:24px">ArturaLabs</h3>
       <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;margin-top:4px">Version 0.2.0 — Shell + Lead Scraper</p>
       <p style="margin-top:18px">A local-first workspace for finding clients and closing them. All of your data stays on this computer.</p>
@@ -436,10 +441,52 @@
 </main>
 
 <!-- ================= FIRST RUN ================= -->
+<!-- Licence gate. Sits above everything. The app is unreachable until this passes. -->
+<div id="lock" hidden>
+  <div class="lock-card">
+    <svg class="lock-mark" viewBox="0 0 100 100"><use href="#i-mark"/></svg>
+    <div class="lock-wm">Artura<span>Labs</span></div>
+
+    <h2 id="lockTitle">Sign in to ArturaLabs</h2>
+    <p class="lock-lede" id="lockLede">Paste the licence key from your ArturaLabs purchase. You only do this once on this computer.</p>
+
+    <div class="lock-field">
+      <label for="lockKey">Licence key</label>
+      <input type="text" id="lockKey" spellcheck="false" autocomplete="off"
+             placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+      <div class="lock-msg" id="lockMsg"></div>
+    </div>
+
+    <button class="btn pri lg" id="lockGo">Unlock ArturaLabs</button>
+
+    <details class="lock-help">
+      <summary>Where do I find my key?</summary>
+      <div>
+        <p>It is on your Whop orders page, on the ArturaLabs purchase. Sign in with the
+        same email you bought with — no password needed.</p>
+        <p><a href="#" data-ext="https://whop.com/@me/settings/memberships/">Open my Whop memberships</a></p>
+        <p>If you have just bought and the key has not arrived yet, give it a minute
+        and refresh that page.</p>
+      </div>
+    </details>
+
+    <div class="lock-foot">
+      Your leads, notes and API keys stay on this computer. Signing in only checks
+      that your membership is active.
+    </div>
+  </div>
+</div>
+
+<!-- Only ever appears in a build where licence checking was never configured. -->
+<div id="unlicensedBanner" hidden>
+  <b>Unlicensed build.</b> Licence checking is not set up, so anyone can open this copy.
+  Do not hand it out.
+</div>
+
 <div id="onb" hidden>
   <div class="onb-card">
     <div class="onb-side">
-      <svg class="onb-mark" viewBox="0 0 120 100"><use href="#i-mark"/></svg>
+      <svg class="onb-mark" viewBox="0 0 100 100"><use href="#i-mark"/></svg>
       <div class="onb-wm">Artura<span>Labs</span></div>
       <div class="onb-steps">
         <div class="os" data-s="0"><i>0</i> Terms</div>

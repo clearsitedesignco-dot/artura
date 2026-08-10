@@ -17,6 +17,11 @@
    "sha256": "049371533708101d"
   },
   {
+   "path": "LICENSE-SETUP.md",
+   "bytes": 4214,
+   "sha256": "98a93ec9364195f9"
+  },
+  {
    "path": "OPEN ARTURALABS (no terminal).bat",
    "bytes": 550,
    "sha256": "e2a93848f25090ee"
@@ -47,14 +52,39 @@
    "sha256": "a05afdf7fb33d360"
   },
   {
+   "path": "assets/icon-dark.png",
+   "bytes": 23762,
+   "sha256": "4471c7e4e8669ea2"
+  },
+  {
+   "path": "assets/icon.icns",
+   "bytes": 120845,
+   "sha256": "a8cdf0250b2e44df"
+  },
+  {
+   "path": "assets/icon.ico",
+   "bytes": 23184,
+   "sha256": "57632d2ea676d77b"
+  },
+  {
+   "path": "assets/icon.png",
+   "bytes": 23729,
+   "sha256": "3468a458735282c6"
+  },
+  {
+   "path": "assets/mark-transparent.png",
+   "bytes": 34634,
+   "sha256": "fbae293d661f052d"
+  },
+  {
    "path": "assets/mark-white.svg",
-   "bytes": 248,
-   "sha256": "a20a6af9f7ea2c91"
+   "bytes": 1919,
+   "sha256": "993d4419c7d69669"
   },
   {
    "path": "assets/mark.svg",
-   "bytes": 248,
-   "sha256": "0e210c40bb74f79b"
+   "bytes": 1919,
+   "sha256": "e11868d8447e573e"
   },
   {
    "path": "legal/TERMS-DRAFT.md",
@@ -62,14 +92,34 @@
    "sha256": "a9892f42f93fa00c"
   },
   {
+   "path": "netlify.toml",
+   "bytes": 292,
+   "sha256": "6cf1416458703e66"
+  },
+  {
+   "path": "netlify/functions/license.js",
+   "bytes": 5759,
+   "sha256": "ee69e3f6bf27589c"
+  },
+  {
+   "path": "netlify/public/index.html",
+   "bytes": 448,
+   "sha256": "3695c8c8eff6497d"
+  },
+  {
    "path": "package.json",
-   "bytes": 1730,
-   "sha256": "064fa1b6ef22ffe2"
+   "bytes": 1901,
+   "sha256": "4f44c80b4eef4fcd"
   },
   {
    "path": "scripts/fetch-fonts.js",
    "bytes": 3088,
    "sha256": "5e07778db9633ea0"
+  },
+  {
+   "path": "src/main/config.js",
+   "bytes": 1796,
+   "sha256": "f6e6e91daaef48d2"
   },
   {
    "path": "src/main/enrich.js",
@@ -82,14 +132,19 @@
    "sha256": "8db4fb90938148ac"
   },
   {
+   "path": "src/main/license.js",
+   "bytes": 6497,
+   "sha256": "4ecce46d20077b75"
+  },
+  {
    "path": "src/main/main.js",
-   "bytes": 14557,
-   "sha256": "b497ba471461a473"
+   "bytes": 14955,
+   "sha256": "aa49911a7c7d7a77"
   },
   {
    "path": "src/main/preload.js",
-   "bytes": 1799,
-   "sha256": "61f735d19e3a6af2"
+   "bytes": 1965,
+   "sha256": "41a65740a16fdff1"
   },
   {
    "path": "src/main/providers/index.js",
@@ -118,8 +173,8 @@
   },
   {
    "path": "src/renderer/app.js",
-   "bytes": 150892,
-   "sha256": "a164ee5c73030c48"
+   "bytes": 156419,
+   "sha256": "98d39fbaba4bb2a0"
   },
   {
    "path": "src/renderer/fonts/fonts.css",
@@ -128,13 +183,13 @@
   },
   {
    "path": "src/renderer/index.html",
-   "bytes": 29769,
-   "sha256": "f4acdc239c3a8c35"
+   "bytes": 33424,
+   "sha256": "c5887fb035bf0012"
   },
   {
    "path": "src/renderer/styles.css",
-   "bytes": 51432,
-   "sha256": "de619ae3d076aa6d"
+   "bytes": 54579,
+   "sha256": "dfd727e837806ddb"
   }
  ]
 }

@@ -1,0 +1,10 @@
+# Deploy target for the ArturaLabs licence proxy.
+# This is NOT the desktop app — it is one small function that holds the Whop
+# API key so the key never ships inside the app.
+
+[build]
+  functions = "netlify/functions"
+  publish   = "netlify/public"
+
+[functions]
+  node_bundler = "esbuild"

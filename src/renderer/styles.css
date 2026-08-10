@@ -12,7 +12,7 @@ body{background:var(--bg-app);font-family:var(--sans);color:var(--ink);display:f
 /* SIDEBAR */
 .rail{width:262px;flex:0 0 262px;background:var(--bg-rail);border-right:1px solid var(--line);display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;gap:11px;padding:26px 20px 22px}
-.brand .lg{width:30px;height:26px;flex:0 0 30px;color:var(--ink)}
+.brand .lg{width:28px;height:28px;flex:0 0 28px;color:var(--ink)}
 .brand .wm{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.025em}
 .brand .wm span{color:var(--ink-3);font-weight:500}
 .nav{flex:1;min-height:0;overflow-y:auto;padding:4px 12px}
@@ -608,7 +608,7 @@ td.dash{color:var(--line-2);cursor:help}
 #onb[hidden]{display:none}
 .onb-card{display:flex;width:100%;max-width:1000px;height:min(660px,92vh);background:var(--bg-panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(20,20,22,.10)}
 .onb-side{width:280px;flex:0 0 280px;background:var(--bg-invert);color:var(--ink-invert);padding:34px 30px;display:flex;flex-direction:column}
-.onb-mark{width:38px;height:32px;color:#fff}
+.onb-mark{width:34px;height:34px;color:#fff}
 .onb-wm{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.025em;margin-top:14px}
 .onb-wm span{color:rgba(255,255,255,.45);font-weight:500}
 .onb-steps{margin-top:42px;display:grid;gap:4px}
@@ -702,3 +702,54 @@ td.dash{color:var(--line-2);cursor:help}
 
 .polishnote{font-size:12.5px;color:var(--ink-3);margin-top:10px;line-height:1.55}
 .polishnote .lnk{color:var(--ink);text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-weight:500}
+
+/* ---------- licence gate ---------------------------------------------------
+   Deliberately calm. A paying member seeing this screen has done nothing
+   wrong, so it should not look like an error page or an accusation. */
+#lock{position:fixed;inset:0;z-index:400;background:var(--bg-invert);
+      display:grid;place-items:center;padding:24px}
+.lock-card{width:min(440px,100%);text-align:center;color:#fff}
+.lock-mark{width:40px;height:40px;color:#fff}
+.lock-wm{font-family:var(--display);font-weight:700;font-size:20px;
+         letter-spacing:-.025em;margin-top:12px}
+.lock-wm span{color:rgba(255,255,255,.45);font-weight:500}
+#lock h2{font-family:var(--display);font-size:23px;font-weight:600;
+         letter-spacing:-.02em;margin:30px 0 0}
+.lock-lede{color:rgba(255,255,255,.55);font-size:13.5px;line-height:1.65;
+           margin:10px 0 0}
+.lock-field{margin-top:26px;text-align:left}
+.lock-field label{display:block;font-size:11px;text-transform:uppercase;
+                  letter-spacing:.09em;color:rgba(255,255,255,.4);margin-bottom:8px}
+.lock-field input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);
+                  color:#fff;border-radius:8px;padding:12px 14px;font-family:var(--mono);
+                  font-size:13px;transition:border-color .18s,background .18s}
+.lock-field input:focus{outline:none;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.09)}
+.lock-field input::placeholder{color:rgba(255,255,255,.22)}
+.lock-msg{font-size:12.5px;line-height:1.55;margin-top:10px;min-height:1px}
+.lock-msg.err{color:#F0908D}
+.lock-msg.ok{color:#7FD79B}
+.lock-msg.busy{color:rgba(255,255,255,.5)}
+#lock .btn.pri{width:100%;margin-top:18px;background:#fff;color:var(--ink);border-color:#fff}
+#lock .btn.pri:hover:not(:disabled){background:rgba(255,255,255,.88)}
+#lock .btn.pri:disabled{opacity:.45}
+.lock-help{margin-top:22px;text-align:left;font-size:12.5px;color:rgba(255,255,255,.5)}
+.lock-help summary{cursor:pointer;color:rgba(255,255,255,.65);padding:6px 0}
+.lock-help summary:hover{color:#fff}
+.lock-help p{margin:9px 0;line-height:1.6}
+.lock-help a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.lock-foot{margin-top:26px;font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.32);
+           border-top:1px solid rgba(255,255,255,.1);padding-top:18px}
+#lock .lock-signout{margin-top:14px;background:none;border:0;color:rgba(255,255,255,.4);
+                    font-size:12px;cursor:pointer;text-decoration:underline;
+                    text-underline-offset:3px;font-family:var(--sans)}
+#lock .lock-signout:hover{color:rgba(255,255,255,.75)}
+
+#unlicensedBanner{position:fixed;left:0;right:0;bottom:0;z-index:300;
+                  background:#9A6B08;color:#fff;font-size:12px;padding:9px 16px;
+                  text-align:center;letter-spacing:.01em}
+
+/* Licence row on the API Keys screen */
+.lic-row{display:flex;align-items:center;justify-content:space-between;gap:16px;
+         padding:14px 0;border-top:1px solid var(--line)}
+.lic-row .lic-t{font-size:13px;font-weight:500}
+.lic-row .lic-s{font-size:12px;color:var(--ink-3);margin-top:3px}
