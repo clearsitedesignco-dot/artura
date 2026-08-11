@@ -19,7 +19,7 @@
    handed out by accident.
 --------------------------------------------------------------------------- */
 
-const LICENSE_PROXY_URL = process.env.ARTURA_LICENSE_URL || 'PASTE_YOUR_NETLIFY_FUNCTION_URL_HERE';
+const LICENSE_PROXY_URL = process.env.ARTURA_LICENSE_URL || 'https://ubiquitous-tulumba-5ff5eb.netlify.app/.netlify/functions/license';
 
 /* How long the app keeps working without reaching the licence server.
    Members lose internet, get on planes, work from cafes with captive portals.
