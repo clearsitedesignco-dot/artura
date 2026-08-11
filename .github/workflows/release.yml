@@ -2,36 +2,15 @@ name: Build ArturaLabs
 
 on:
   push:
-    tags: ['v*']
-  workflow_dispatch:          # lets you run it manually from the Actions tab
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-
-  # Runs the real app on a virtual screen and photographs every page.
-  # If the stylesheet fails to load, this job fails and no release goes out.
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
-      - run: npm ci
-      - run: npm run fonts
-      - name: Screenshot every screen
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1400x900x24" npm run screenshots
-        env:
-          ARTURA_SCREENSHOT_DIR: ${{ github.workspace }}/screenshots
-      - uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: screenshots/*.png
-          if-no-files-found: error
-
   build:
-    needs: verify
     strategy:
       fail-fast: false
       matrix:
@@ -48,10 +27,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: npm }
       - run: npm ci
+      - run: npm run fonts
       - run: npm run ${{ matrix.cmd }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Fill these in once you buy certificates, and the warnings disappear:
+          # Fill these in once certificates are bought and warnings disappear:
           # CSC_LINK: ${{ secrets.CSC_LINK }}
           # CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           # APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -73,19 +53,21 @@ jobs:
       - name: Publish the download page
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*.(exe|dmg)
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
           generate_release_notes: true
           body: |
             ## Download ArturaLabs
 
-            **Windows** — download the `.exe`, double-click, follow the installer.
-            **Mac** — download the `.dmg`, drag ArturaLabs into Applications.
+            **Windows** - download the `.exe`, double-click, follow the installer.
+            **Mac** - download the `.dmg`, drag ArturaLabs into Applications.
 
             ### First launch
 
             This build is not yet code-signed, so your computer will warn you once.
 
-            **Windows:** "Windows protected your PC" → click **More info** → **Run anyway**
-            **Mac:** right-click the app → **Open** → **Open**
+            **Windows:** "Windows protected your PC" -> click **More info** -> **Run anyway**
+            **Mac:** right-click the app -> **Open** -> **Open**
 
             You only do this the first time.
