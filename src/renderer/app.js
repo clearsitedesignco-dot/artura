@@ -2579,58 +2579,52 @@ function lockMsg(text, kind){
 function showLock(state){
   const titles = {
     none:            'Sign in to ArturaLabs',
-    revoked:         'We could not confirm your membership',
-    wrong_machine:   'This licence is on another computer',
+    revoked:         'Your session has ended',
+    wrong_machine:   'Already signed in elsewhere',
     offline_expired: 'Time to check in'
   };
   const ledes = {
-    none:            'Paste the licence key from your ArturaLabs purchase. You only do this once on this computer.',
-    revoked:         'Whop did not accept this key. If your payment is up to date, this is usually fixed by pasting the key again.',
-    wrong_machine:   'A licence works on one computer at a time. Reset it from your Whop orders page, then paste it here.',
-    offline_expired: 'ArturaLabs has not been able to reach the licence server for a while. Connect to the internet and unlock again.'
+    none:            'Sign in with the Whop account you bought ArturaLabs with. You only do this once on this computer.',
+    revoked:         'Your Whop session has ended. Sign in again to carry on.',
+    wrong_machine:   'Your membership is already in use on another computer. Sign out there, or contact support to reset it.',
+    offline_expired: 'ArturaLabs has not checked your membership in a while. Connect to the internet and sign in again.'
   };
   const key = (state && state.state) || 'none';
   $('lockTitle').textContent = titles[key] || titles.none;
   $('lockLede').textContent  = ledes[key]  || ledes.none;
   if (state && state.message && key !== 'none') lockMsg(state.message, 'err');
   $('lock').hidden = false;
-  setTimeout(() => { const f = $('lockKey'); if (f) f.focus(); }, 60);
 }
 
 async function tryUnlock(){
-  const raw = $('lockKey').value.trim();
-  if (!raw){ lockMsg('Paste your licence key first.', 'err'); return; }
-
   const btn = $('lockGo');
   btn.disabled = true;
   const label = btn.textContent;
-  btn.textContent = 'Checking…';
-  lockMsg('Checking with Whop…', 'busy');
+  btn.textContent = 'Waiting for Whop…';
+  lockMsg('Your browser is opening. Sign in to Whop, then come back here.', 'busy');
 
-  const res = await API.license.activate(raw);
+  const res = await API.license.signIn();
 
   if (res && res.ok){
     lockMsg('You are in. Opening ArturaLabs…', 'ok');
-    licenseState = { state:'ok', ok:true };
-    setTimeout(() => { $('lock').hidden = true; $('lockKey').value = ''; }, 600);
+    setTimeout(() => location.reload(), 700);
     return;
   }
 
   btn.disabled = false;
   btn.textContent = label;
-  const code = res && res.code;
   const friendly = {
-    EMPTY:        'Paste your licence key first.',
-    NETWORK:      'Could not reach the licence server. Check your internet connection and try again.',
-    BAD_KEY:      'That key was not found. Check for a typo or a missing character at the end.',
-    WRONG_MACHINE:'This licence is already active on another computer. Reset it from your Whop orders page, then try again.',
-    WRONG_PRODUCT:'That key is for a different product.',
-    INACTIVE:     'That membership is no longer active. If you have just renewed, give it a minute and try again.',
-    RATE_LIMIT:   'Too many attempts. Wait a minute and try again.',
-    SERVER_UNCONFIGURED: 'The licence server is not set up yet. This is not a problem with your key — contact support.',
-    NOT_CONFIGURED:      'This build has no licence server configured.'
+    DENIED:         'Sign-in was cancelled. Click the button to try again.',
+    TIMEOUT:        'That took too long. Click the button to try again.',
+    PORT:           'Close any other copy of ArturaLabs, then try again.',
+    NETWORK:        'Could not reach Whop. Check your internet connection and try again.',
+    NO_MEMBERSHIP:  'We could not find an active ArturaLabs membership on that Whop account. If you have just bought, give it a minute and try again.',
+    BAD_TOKEN:      'That sign-in expired before it finished. Please try again.',
+    BAD_STATE:      'The sign-in did not complete safely. Please try again.',
+    SERVER_UNCONFIGURED: 'The membership server is not set up yet. This is not a problem with your account — contact support.',
+    NOT_CONFIGURED: 'This build is not set up for sign-in.'
   };
-  lockMsg(friendly[code] || (res && res.message) || 'That licence key was not accepted.', 'err');
+  lockMsg(friendly[res && res.code] || (res && res.message) || 'Sign-in did not complete. Please try again.', 'err');
 }
 
 function renderLicenceRow(){
@@ -2641,7 +2635,7 @@ function renderLicenceRow(){
   if (licenseState.plan)  bits.push(licenseState.plan);
   if (licenseState.email) bits.push(licenseState.email);
   const when = licenseState.state === 'offline'
-    ? 'Working offline' : 'Active on this computer';
+    ? 'Working offline' : 'Signed in on this computer';
   $('licStatus').textContent = bits.length ? when + ' · ' + bits.join(' · ') : when;
 }
 
@@ -2664,19 +2658,20 @@ function wireLicenceRow(){
 function wireLicense(){
   const go = $('lockGo');
   if (go) go.addEventListener('click', tryUnlock);
-  const f = $('lockKey');
-  if (f) f.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
   document.querySelectorAll('#lock [data-ext]').forEach(a =>
     a.addEventListener('click', e => { e.preventDefault(); API.openExternal(a.dataset.ext); }));
 }
 
 (async function boot(){
+  window.addEventListener('error', e => { document.title = 'ERR: ' + e.message + ' @' + e.lineno; });
+  window.addEventListener('unhandledrejection', e => { document.title = 'REJ: ' + (e.reason && (e.reason.message || e.reason)); });
   try{
     wireLicense();
 
     /* Licence before anything else. If this does not pass, the app does not
        open — but the member's saved work is never touched. */
     const lic = await API.license.status();
+
     licenseState = (lic && lic.ok) ? lic.data : null;
     if (!lic || !lic.ok || !licenseState || !licenseState.ok){
       showLock(licenseState || (lic && lic.data) || { state:'none' });

@@ -8,7 +8,7 @@ const call = (channel, payload) => ipcRenderer.invoke(channel, payload);
 contextBridge.exposeInMainWorld('artura', {
   license: {
     status:   opts => call('license:status', opts),
-    activate: key => call('license:activate', key),
+    signIn:   () => call('license:signIn'),
     signOut:  () => call('license:signOut')
   },
   keys: {

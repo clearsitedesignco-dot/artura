@@ -1,39 +1,28 @@
 /* ---------------------------------------------------------------------------
-   ArturaLabs licence proxy.
+   ArturaLabs membership check.
 
-   The desktop app talks to this. This talks to Whop. The Whop API key lives
-   here as an environment variable and never travels to a member's computer.
+   The desktop app signs the member in with Whop directly (OAuth + PKCE, no
+   secret needed). It then sends us the resulting access token and asks one
+   question: does this person have an active ArturaLabs membership?
 
-   This matters more than it sounds. An Electron app is a zip file with a
-   different extension. Anyone who buys ArturaLabs can unpack it and read every
-   line of it, including any key inside. A key shipped in the app is a key
-   published to everyone who ever buys it — and a Whop account key can read
-   your payments, your members and your revenue.
+   We answer it using the Whop ACCOUNT API key, which lives here as an
+   environment variable and never travels to anyone's computer. That key can
+   read your payments, members and revenue — it must never ship inside the app.
 
-   SETUP
-   -----
-   1. Deploy this folder to Netlify.
-   2. Netlify dashboard -> Site settings -> Environment variables, add:
+   ENVIRONMENT VARIABLES (Netlify -> Site settings -> Environment variables)
 
-        WHOP_API_KEY   your Whop account API key
-                       (Whop dashboard -> Developer -> API keys)
+     WHOP_API_KEY      your Whop account API key            (required)
+     WHOP_PRODUCT_ID   prod_... for ArturaLabs              (strongly advised)
+     WHOP_DEVICE_LIMIT how many computers per member, default 2
 
-      Optional, and worth setting:
+   Without WHOP_PRODUCT_ID, a membership to ANY product you sell would open
+   ArturaLabs.
 
-        WHOP_PRODUCT_ID   the prod_... id of the ArturaLabs product.
-                          Without it, ANY valid licence from ANY product you
-                          sell will open the app.
-
-   3. Copy the deployed function address into src/main/config.js.
-
-   Verify with:
-
-     curl -X POST https://YOUR-SITE.netlify.app/.netlify/functions/license \
-       -H "Content-Type: application/json" \
-       -d '{"key":"test-key","hwid":"abc123"}'
+   Redeploy after adding variables — Netlify does not pick them up otherwise.
 --------------------------------------------------------------------------- */
 
-const WHOP_API = 'https://api.whop.com/api/v2/memberships';
+const USERINFO = 'https://api.whop.com/oauth/userinfo';
+const WHOP_API = 'https://api.whop.com/v2';
 
 exports.handler = async (event) => {
   const reply = (status, body) => ({
@@ -48,97 +37,89 @@ exports.handler = async (event) => {
 
   const apiKey = process.env.WHOP_API_KEY;
   if (!apiKey) {
-    // Configuration mistake on our side, not the member's. Say so plainly
-    // rather than telling a paying customer their key is bad.
+    // Our mistake, not the member's. Say so, rather than implying they did
+    // something wrong.
     return reply(500, { valid: false, code: 'SERVER_UNCONFIGURED',
-      message: 'The licence server is not set up yet. This is not a problem with your key.' });
+      message: 'The membership server is not set up yet. This is not a problem with your account.' });
   }
 
   let payload = {};
   try { payload = JSON.parse(event.body || '{}'); }
   catch { return reply(400, { valid: false, code: 'BAD_REQUEST', message: 'Malformed request.' }); }
 
-  const key  = String(payload.key  || '').trim();
-  const hwid = String(payload.hwid || '').trim();
-
-  if (!key)  return reply(400, { valid: false, code: 'EMPTY',   message: 'No licence key supplied.' });
-  if (!hwid) return reply(400, { valid: false, code: 'NO_HWID', message: 'No machine id supplied.' });
-
-  // Keys are short and printable. Reject anything else before it reaches Whop.
-  if (key.length > 128 || /[\r\n\t]/.test(key)) {
-    return reply(400, { valid: false, code: 'BAD_KEY', message: 'That does not look like a licence key.' });
+  const token = String(payload.access_token || '').trim();
+  if (!token) {
+    return reply(400, { valid: false, code: 'NO_TOKEN', message: 'No sign-in token supplied.' });
   }
 
-  let res, body = {};
+  /* 1. Who is this? Ask Whop using the member's own token. */
+  let who = {};
   try {
-    res = await fetch(`${WHOP_API}/${encodeURIComponent(key)}/validate_license`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ metadata: { hwid } })
-    });
-    try { body = await res.json(); } catch { body = {}; }
-  } catch (err) {
+    const r = await fetch(USERINFO, { headers: { Authorization: `Bearer ${token}` } });
+    if (r.status === 401 || r.status === 403) {
+      return reply(200, { valid: false, code: 'BAD_TOKEN',
+        message: 'That sign-in has expired. Please sign in again.' });
+    }
+    who = await r.json();
+  } catch {
     return reply(502, { valid: false, code: 'UPSTREAM',
       message: 'Could not reach Whop. Try again in a moment.' });
   }
 
-  /* Whop answers 201 when the key is good — either it was unbound and has now
-     been bound to this machine, or it was already bound to this same machine. */
-  if (res.status === 201 || res.status === 200) {
-    const m = body || {};
+  const userId = who.sub || who.id;
+  if (!userId) {
+    return reply(200, { valid: false, code: 'BAD_TOKEN',
+      message: 'Whop did not recognise that sign-in. Please try again.' });
+  }
 
-    // Optional: make sure the key belongs to THIS product, not some other
-    // thing sold from the same Whop account.
+  /* 2. Do they hold an active membership for THIS product? Asked with the
+        account key, because a member's own token should not be trusted to
+        answer a question about whether they have paid us. */
+  let memberships = [];
+  try {
+    const url = new URL(`${WHOP_API}/memberships`);
+    url.searchParams.set('user_id', userId);
+    url.searchParams.set('per', '50');
     const wantProduct = process.env.WHOP_PRODUCT_ID;
-    if (wantProduct) {
-      const got = m.product || m.product_id || (m.plan && m.plan.product) || null;
-      if (got && got !== wantProduct) {
-        return reply(200, { valid: false, code: 'WRONG_PRODUCT',
-          message: 'That key is for a different product.' });
-      }
-    }
+    if (wantProduct) url.searchParams.set('product_id', wantProduct);
 
-    // A cancelled or expired membership can still return a key. Check status.
-    const state = (m.status || m.valid_status || '').toLowerCase();
-    const dead = ['expired', 'cancelled', 'canceled', 'past_due', 'unresolved'];
-    if (state && dead.includes(state)) {
-      return reply(200, { valid: false, code: 'INACTIVE',
-        message: 'That membership is no longer active.' });
-    }
-
-    return reply(200, {
-      valid: true,
-      status: m.status || 'active',
-      plan: (m.plan && (m.plan.name || m.plan.id)) || m.plan_id || null,
-      email: m.email || (m.user && m.user.email) || null
+    const r = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${apiKey}` }
     });
+
+    if (r.status === 401 || r.status === 403) {
+      return reply(500, { valid: false, code: 'SERVER_UNCONFIGURED',
+        message: 'The membership server could not authenticate. This is not a problem with your account.' });
+    }
+
+    const body = await r.json();
+    memberships = Array.isArray(body.data) ? body.data : (Array.isArray(body) ? body : []);
+  } catch {
+    return reply(502, { valid: false, code: 'UPSTREAM',
+      message: 'Could not reach Whop. Try again in a moment.' });
   }
 
-  /* 400 is Whop's answer when the key is bound to a different machine. */
-  if (res.status === 400) {
-    return reply(200, { valid: false, code: 'WRONG_MACHINE',
-      message: 'This licence is already active on another computer. Reset it from your Whop orders page, then try again.' });
+  const LIVE = ['active', 'completed', 'trialing', 'trialing_active'];
+  const wantProduct = process.env.WHOP_PRODUCT_ID;
+
+  const good = memberships.find(m => {
+    const state = String(m.status || m.valid_status || '').toLowerCase();
+    if (!LIVE.includes(state) && m.valid !== true) return false;
+    if (!wantProduct) return true;
+    const got = m.product || m.product_id || (m.plan && m.plan.product) || null;
+    return !got || got === wantProduct;
+  });
+
+  if (!good) {
+    return reply(200, { valid: false, code: 'NO_MEMBERSHIP',
+      message: 'We could not find an active ArturaLabs membership on that Whop account. If you have just bought, give it a minute and try again.' });
   }
 
-  if (res.status === 404) {
-    return reply(200, { valid: false, code: 'BAD_KEY',
-      message: 'That licence key was not found. Check for a typo or a missing character.' });
-  }
-
-  if (res.status === 401 || res.status === 403) {
-    // Our key is wrong, not theirs.
-    return reply(500, { valid: false, code: 'SERVER_UNCONFIGURED',
-      message: 'The licence server could not authenticate. This is not a problem with your key.' });
-  }
-
-  if (res.status === 429) {
-    return reply(200, { valid: false, code: 'RATE_LIMIT',
-      message: 'Too many attempts. Wait a minute and try again.' });
-  }
-
-  return reply(200, { valid: false, code: 'REJECTED',
-    message: 'That licence key was not accepted.' });
+  return reply(200, {
+    valid: true,
+    status: good.status || 'active',
+    plan: (good.plan && (good.plan.name || good.plan.id)) || good.plan_id || null,
+    email: who.email || null,
+    user: userId
+  });
 };

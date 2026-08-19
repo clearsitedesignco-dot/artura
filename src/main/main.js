@@ -63,7 +63,7 @@ const handle = (ch, fn) => ipcMain.handle(ch, async (_e, arg) => {
    Runs before anything else the member can do. The renderer asks for status on
    boot and refuses to open the app until this says ok. */
 handle('license:status',   opts => license.status(opts || {}));
-handle('license:activate', key => license.activate(key));
+handle('license:signIn', () => license.signIn());
 handle('license:signOut',  () => license.signOut());
 
 /* ---------------- keys ---------------- */
